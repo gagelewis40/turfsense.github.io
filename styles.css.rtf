@@ -1,0 +1,135 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 :root \{\
+    --primary: #2ecc71;\
+    --dark: #2c3e50;\
+    --darker: #1a252f;\
+    --light: #ecf0f1;\
+    --alert: #e74c3c;\
+\}\
+\
+body \{\
+    margin: 0;\
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\
+    background-color: var(--darker);\
+    color: var(--light);\
+    height: 100vh;\
+    display: flex;\
+    flex-direction: column;\
+\}\
+\
+nav \{\
+    height: 60px;\
+    background-color: var(--dark);\
+    display: flex;\
+    justify-content: space-between;\
+    align-items: center;\
+    padding: 0 2rem;\
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);\
+\}\
+\
+.logo \{\
+    font-size: 1.5rem;\
+    font-weight: bold;\
+    color: var(--primary);\
+\}\
+\
+.connect-btn \{\
+    background-color: var(--primary);\
+    border: none;\
+    padding: 10px 20px;\
+    color: white;\
+    border-radius: 5px;\
+    cursor: pointer;\
+    font-weight: bold;\
+    transition: background 0.3s;\
+\}\
+\
+.connect-btn:hover \{\
+    background-color: #27ae60;\
+\}\
+\
+.main-container \{\
+    display: flex;\
+    flex: 1;\
+    height: calc(100vh - 60px);\
+\}\
+\
+.dashboard \{\
+    width: 300px;\
+    background-color: var(--dark);\
+    padding: 2rem;\
+    display: flex;\
+    flex-direction: column;\
+    gap: 1.5rem;\
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);\
+    z-index: 10;\
+\}\
+\
+.metric-card \{\
+    background: rgba(255,255,255,0.05);\
+    padding: 1rem;\
+    border-radius: 8px;\
+    border-left: 4px solid var(--primary);\
+\}\
+\
+.metric-card .label \{\
+    display: block;\
+    font-size: 0.8rem;\
+    opacity: 0.7;\
+    margin-bottom: 0.5rem;\
+\}\
+\
+.metric-card .value \{\
+    font-size: 1.5rem;\
+    font-weight: bold;\
+\}\
+\
+#canvas-container \{\
+    flex: 1;\
+    position: relative;\
+    overflow: hidden;\
+\}\
+\
+.overlay-text \{\
+    position: absolute;\
+    top: 20px;\
+    left: 20px;\
+    background: rgba(0,0,0,0.5);\
+    padding: 5px 10px;\
+    border-radius: 4px;\
+    font-size: 0.8rem;\
+    pointer-events: none;\
+\}\
+\
+.alert-box \{\
+    background-color: var(--alert);\
+    padding: 1rem;\
+    border-radius: 5px;\
+    font-weight: bold;\
+    animation: pulse 2s infinite;\
+\}\
+\
+.hidden \{\
+    display: none;\
+\}\
+\
+.secondary-btn \{\
+    background: transparent;\
+    border: 1px solid var(--light);\
+    color: var(--light);\
+    padding: 10px;\
+    cursor: pointer;\
+    margin-top: auto;\
+\}\
+\
+@keyframes pulse \{\
+    0% \{ opacity: 1; \}\
+    50% \{ opacity: 0.7; \}\
+    100% \{ opacity: 1; \}\
+\}}

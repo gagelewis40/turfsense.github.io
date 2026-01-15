@@ -1,0 +1,169 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 // --- 3D SCENE SETUP (Three.js) ---\
+const container = document.getElementById('canvas-container');\
+const scene = new THREE.Scene();\
+scene.background = new THREE.Color(0x1a252f); // Match CSS background\
+\
+// Camera\
+const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);\
+camera.position.set(0, 10, 15);\
+camera.lookAt(0, 0, 0);\
+\
+// Renderer\
+const renderer = new THREE.WebGLRenderer(\{ antialias: true \});\
+renderer.setSize(container.clientWidth, container.clientHeight);\
+container.appendChild(renderer.domElement);\
+\
+// Controls\
+const controls = new THREE.OrbitControls(camera, renderer.domElement);\
+controls.enableDamping = true;\
+\
+// Lighting\
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);\
+scene.add(ambientLight);\
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);\
+dirLight.position.set(10, 20, 10);\
+scene.add(dirLight);\
+\
+// --- CREATE THE LAWN ---\
+// We create a grid of squares to represent different zones of the lawn\
+const lawnGroup = new THREE.Group();\
+const gridSize = 10;\
+const tileSize = 2;\
+const lawnTiles = [];\
+\
+const geometry = new THREE.BoxGeometry(tileSize, 0.2, tileSize);\
+\
+for (let x = 0; x < gridSize; x++) \{\
+    for (let z = 0; z < gridSize; z++) \{\
+        // Default Healthy Grass Color\
+        const material = new THREE.MeshStandardMaterial(\{ color: 0x2ecc71 \});\
+        const tile = new THREE.Mesh(geometry, material);\
+        \
+        // Position tile\
+        tile.position.x = (x * tileSize) - (gridSize * tileSize / 2);\
+        tile.position.z = (z * tileSize) - (gridSize * tileSize / 2);\
+        \
+        // Add metadata to the tile for updates later\
+        tile.userData = \{ \
+            id: `$\{x\}-$\{z\}`,\
+            health: 100 \
+        \};\
+\
+        lawnTiles.push(tile);\
+        lawnGroup.add(tile);\
+    \}\
+\}\
+scene.add(lawnGroup);\
+\
+// Animation Loop\
+function animate() \{\
+    requestAnimationFrame(animate);\
+    controls.update();\
+    renderer.render(scene, camera);\
+\}\
+animate();\
+\
+// Handle Window Resize\
+window.addEventListener('resize', () => \{\
+    camera.aspect = container.clientWidth / container.clientHeight;\
+    camera.updateProjectionMatrix();\
+    renderer.setSize(container.clientWidth, container.clientHeight);\
+\});\
+\
+\
+// --- BLUETOOTH & DATA LOGIC ---\
+\
+const connectBtn = document.getElementById('bt-connect-btn');\
+const statusDisplay = document.getElementById('status-display');\
+const moistureDisplay = document.getElementById('moisture-display');\
+const heightDisplay = document.getElementById('height-display');\
+const alertBox = document.getElementById('alert-box');\
+\
+// This function highlights a specific area of the 3D lawn\
+// Usage: visualizeTroubleZone(5, 5, 'high-grass')\
+function visualizeTroubleZone(x, z, issueType) \{\
+    const tileIndex = x * gridSize + z;\
+    if(lawnTiles[tileIndex]) \{\
+        const tile = lawnTiles[tileIndex];\
+        \
+        if (issueType === 'high-grass') \{\
+            // Make the tile taller (needs trimming) and yellow\
+            tile.scale.y = 5; \
+            tile.position.y = 0.5; // adjust position so it grows up, not down\
+            tile.material.color.setHex(0xf1c40f); // Yellow\
+        \} else if (issueType === 'dry') \{\
+            // Turn brown\
+            tile.material.color.setHex(0xe67e22);\
+        \}\
+    \}\
+\}\
+\
+// REAL BLUETOOTH CONNECTION\
+// Note: This requires the specific Service UUID of your hardware\
+connectBtn.addEventListener('click', async () => \{\
+    try \{\
+        statusDisplay.innerText = "Scanning...";\
+        \
+        // Request Bluetooth Device\
+        const device = await navigator.bluetooth.requestDevice(\{\
+            acceptAllDevices: true, // For prod, use filters: [\{ services: ['battery_service'] \}]\
+            optionalServices: ['battery_service'] // Replace with your Sensor Service UUID\
+        \});\
+\
+        const server = await device.gatt.connect();\
+        statusDisplay.innerText = "Connected";\
+        statusDisplay.style.color = "#2ecc71";\
+\
+        // HERE you would read the characteristics\
+        // const service = await server.getPrimaryService('...');\
+        // const characteristic = await service.getCharacteristic('...');\
+        // const value = await characteristic.readValue();\
+        \
+        console.log("Connected to: " + device.name);\
+\
+    \} catch (error) \{\
+        console.log(error);\
+        statusDisplay.innerText = "Connection Failed / Cancelled";\
+        statusDisplay.style.color = "#e74c3c";\
+    \}\
+\});\
+\
+\
+// --- SIMULATION MODE (For Demo Purposes) ---\
+// Since we don't have the sensor physically, this simulates data coming in\
+document.getElementById('simulate-btn').addEventListener('click', () => \{\
+    statusDisplay.innerText = "Simulating Data Stream...";\
+    statusDisplay.style.color = "#3498db";\
+\
+    // Randomize dashboard numbers\
+    moistureDisplay.innerText = "42%";\
+    heightDisplay.innerText = "8.5 cm";\
+    document.getElementById('nitrogen-display').innerText = "120 ppm";\
+\
+    // Trigger visualizer\
+    alertBox.classList.remove('hidden');\
+    \
+    // Reset lawn\
+    lawnTiles.forEach(t => \{\
+        t.scale.y = 1;\
+        t.position.y = 0;\
+        t.material.color.setHex(0x2ecc71);\
+    \});\
+\
+    // Create a "Patch" that needs trimming in the 3D view\
+    // Simulating a sensor reading a high spot in the middle of the lawn\
+    visualizeTroubleZone(4, 4, 'high-grass');\
+    visualizeTroubleZone(4, 5, 'high-grass');\
+    visualizeTroubleZone(5, 4, 'high-grass');\
+    visualizeTroubleZone(5, 5, 'high-grass');\
+    \
+    // Create a dry patch\
+    visualizeTroubleZone(8, 8, 'dry');\
+\});}
